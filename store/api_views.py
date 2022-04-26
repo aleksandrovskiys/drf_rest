@@ -5,6 +5,10 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.generics import DestroyAPIView
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.generics import GenericAPIView
+from rest_framework.response import Response
+
+from .serializers import ProductStatSerializer
 from rest_framework.pagination import LimitOffsetPagination
 
 from store.models import Product
@@ -110,3 +114,20 @@ class ProductRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
             )
 
         return response
+
+
+class ProductStats(GenericAPIView):
+    lookup_field = "id"
+    serializer_class = ProductStatSerializer
+    queryset=  Product.objects.all()
+
+    def get(self, request, format=None, id=None):
+        obj = self.get_object()
+        serializer = ProductStatSerializer({
+            "stats": {
+                "2019-01-01": [5, 10, 15],
+                "2019-01-02": [6, 16, 162],
+            }
+        })
+
+        return Response(serializer.data)
